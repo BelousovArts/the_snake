@@ -21,7 +21,7 @@
 
 4. Активация виртуального окружения
 
-```source venv/bin/activate```
+```source venv/Scripts/activate```
 
 5. Установка зависимостей
 
