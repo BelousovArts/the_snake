@@ -11,13 +11,13 @@
 
 ```git clone https://github.com/BelousovArts/the_snake```
 
-2. Переход в директорию Oxygen
+2. Переход в директорию the_snake
 
 ```cd the_snake```
 
 3. Создание виртуального окружения
 
-```python3 -m venv venv```
+```python -m venv venv```
 
 4. Активация виртуального окружения
 
@@ -26,6 +26,10 @@
 5. Установка зависимостей
 
 ```pip install -r requirements.txt```
+
+6. Запуск файла
+
+```python the_snake.py ```
 
 ## Зависимости
 Эта программа зависит от интепретатора Python версии 3.9 или выше, PIP 22.0.4 или выше.

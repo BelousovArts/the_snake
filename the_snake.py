@@ -29,7 +29,6 @@ APPLE_COLOR = (255, 0, 0)
 
 # Цвет змейки
 SNAKE_COLOR = (0, 255, 0)
-HEAD_COLOR = (0, 128, 0)
 
 # Скорость движения змейки:
 SPEED = 10
@@ -38,7 +37,7 @@ SPEED = 10
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
 
 # Заголовок окна игрового поля:
-pg.display.set_caption('Змейка')
+pg.display.set_caption('Змейка. Выход из игры - ESC.')
 
 # Настройка времени:
 clock = pg.time.Clock()
@@ -59,19 +58,25 @@ class GameObject():
         Этот метод должен определять, как объект будет отрисовываться на
         экране. По умолчанию — pass.
         """
-        pass
+        raise NotImplementedError('Метод draw() не определен!')
+
+    def draw_cell(self, cell_position, body_color, border_color) -> None:
+        """Метод, который отрисовывает ячейку на игровом поле."""
+        rect = pg.Rect(cell_position, (GRID_SIZE, GRID_SIZE))
+        pg.draw.rect(screen, body_color, rect)
+        pg.draw.rect(screen, border_color, rect, 1)
 
 
 class Apple(GameObject):
     """Класс, описывающий яблоко и действия с ним."""
 
-    def __init__(self, busy_cell, body_color=APPLE_COLOR) -> None:
+    def __init__(self, busy_cell=[], body_color=APPLE_COLOR) -> None:
         """Инициализатор класса Apple."""
         super().__init__()
         self.body_color = body_color
         self.randomize_position(busy_cell)
 
-    def randomize_position(self, busy_cell: list) -> None:
+    def randomize_position(self, busy_cell) -> None:
         """Устанавливает случайное положение яблока на игровом поле."""
         while self.position in busy_cell:
             self.position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
@@ -79,21 +84,18 @@ class Apple(GameObject):
 
     def draw(self) -> None:
         """Метод, который отрисовывает яблоко на игровом поле."""
-        rect = pg.Rect(self.position, (GRID_SIZE, GRID_SIZE))
-        pg.draw.rect(screen, self.body_color, rect)
-        pg.draw.rect(screen, BORDER_COLOR, rect, 1)
+        self.draw_cell(self.position, self.body_color, BORDER_COLOR)
 
 
 class Snake(GameObject):
     """Класс, описывающий змейку и действия с ней."""
 
-    def __init__(self, body_color=SNAKE_COLOR, head_color=HEAD_COLOR) -> None:
+    def __init__(self, body_color=SNAKE_COLOR) -> None:
         """Инициализатор класса Snake."""
         super().__init__()
         self.reset()
         self.next_direction = None
         self.body_color = body_color
-        self.head_color = head_color
 
     def update_direction(self) -> None:
         """Обновляет направление движения змейки."""
@@ -116,20 +118,14 @@ class Snake(GameObject):
 
     def draw(self) -> None:
         """Метод, который отрисовывает змейку на игровом поле."""
-        for position in self.positions:
-            rect = (pg.Rect(position, (GRID_SIZE, GRID_SIZE)))
-            pg.draw.rect(screen, self.body_color, rect)
-            pg.draw.rect(screen, BORDER_COLOR, rect, 1)
-
         # Отрисовка головы змейки
-        head_rect = pg.Rect(self.positions[0], (GRID_SIZE, GRID_SIZE))
-        pg.draw.rect(screen, self.head_color, head_rect)
-        pg.draw.rect(screen, BORDER_COLOR, head_rect, 1)
+        self.draw_cell(self.positions[0], self.body_color, BORDER_COLOR)
 
         # Затирание последнего сегмента
         if self.last:
-            last_rect = pg.Rect(self.last, (GRID_SIZE, GRID_SIZE))
-            pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
+            self.draw_cell(self.last,
+                           BOARD_BACKGROUND_COLOR,
+                           BOARD_BACKGROUND_COLOR)
 
     def reset(self) -> None:
         """Сбрасывает змейку в начальное состояние после столкновения."""
@@ -157,6 +153,9 @@ def handle_keys(game_object) -> None:
                 game_object.next_direction = LEFT
             elif event.key == pg.K_RIGHT and game_object.direction != LEFT:
                 game_object.next_direction = RIGHT
+            elif event.key == pg.K_ESCAPE:
+                return False
+    return True
 
 
 def main() -> None:
@@ -166,7 +165,8 @@ def main() -> None:
     apple = Apple(busy_cell=snake.positions)
 
     while True:
-        handle_keys(snake)
+        if not handle_keys(snake):
+            break
         clock.tick(SPEED)
         snake.move()
         if snake.get_head_position() in snake.positions[2:]:
