@@ -58,7 +58,8 @@ class GameObject():
         Этот метод должен определять, как объект будет отрисовываться на
         экране. По умолчанию — pass.
         """
-        raise NotImplementedError('Метод draw() не определен!')
+        raise NotImplementedError('Метод draw() не определен в '
+                                  f'{self.__class__.__name__}!')
 
     def draw_cell(self, cell_position, body_color, border_color) -> None:
         """Метод, который отрисовывает ячейку на игровом поле."""
@@ -78,9 +79,11 @@ class Apple(GameObject):
 
     def randomize_position(self, busy_cell) -> None:
         """Устанавливает случайное положение яблока на игровом поле."""
-        while self.position in busy_cell:
+        while True:
             self.position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
                              randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
+            if self.position not in busy_cell:
+                break
 
     def draw(self) -> None:
         """Метод, который отрисовывает яблоко на игровом поле."""
@@ -118,14 +121,14 @@ class Snake(GameObject):
 
     def draw(self) -> None:
         """Метод, который отрисовывает змейку на игровом поле."""
-        # Отрисовка головы змейки
-        self.draw_cell(self.positions[0], self.body_color, BORDER_COLOR)
-
         # Затирание последнего сегмента
         if self.last:
             self.draw_cell(self.last,
                            BOARD_BACKGROUND_COLOR,
                            BOARD_BACKGROUND_COLOR)
+
+        # Отрисовка головы змейки
+        self.draw_cell(self.get_head_position(), self.body_color, BORDER_COLOR)
 
     def reset(self) -> None:
         """Сбрасывает змейку в начальное состояние после столкновения."""
@@ -165,16 +168,17 @@ def main() -> None:
     apple = Apple(busy_cell=snake.positions)
 
     while True:
-        if not handle_keys(snake):
-            break
         clock.tick(SPEED)
         snake.move()
-        if snake.get_head_position() in snake.positions[2:]:
+        if snake.get_head_position() in snake.positions[3:]:
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
-        if apple.position in snake.positions:
+            apple.randomize_position(snake.positions)
+        elif apple.position in snake.positions:
             snake.length += 1
             apple.randomize_position(snake.positions)
+        if not handle_keys(snake):
+            break
         snake.update_direction()
         snake.draw()
         apple.draw()
