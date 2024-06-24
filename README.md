@@ -9,27 +9,39 @@
 
 1. Клонирование репозитория 
 
-```git clone https://github.com/BelousovArts/the_snake```
+```bash
+git clone https://github.com/BelousovArts/the_snake
+```
 
 2. Переход в директорию the_snake
 
-```cd the_snake```
+```bash
+cd the_snake
+```
 
 3. Создание виртуального окружения
 
-```python -m venv venv```
+```bash
+python -m venv venv
+```
 
 4. Активация виртуального окружения
 
-```source venv/Scripts/activate```
+```bash
+source venv/Scripts/activate
+```
 
 5. Установка зависимостей
 
-```pip install -r requirements.txt```
+```bash
+pip install -r requirements.txt
+```
 
 6. Запуск файла
 
-```python the_snake.py ```
+```bash
+python the_snake.py
+```
 
 ## Зависимости
 Эта программа зависит от интепретатора Python версии 3.9 или выше, PIP 22.0.4 или выше.

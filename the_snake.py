@@ -170,7 +170,7 @@ def main() -> None:
     while True:
         clock.tick(SPEED)
         snake.move()
-        if snake.get_head_position() in snake.positions[3:]:
+        if snake.get_head_position() in snake.positions[4:]:
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
             apple.randomize_position(snake.positions)
